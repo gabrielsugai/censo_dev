@@ -1,7 +1,57 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env ruby
 
-bundle install
 
-echo
-echo '== Tudo configurado, pode iniciar ;) =='
+puts '== Installing dependencies =='
+system 'gem install bundler --conservative'
+system('bundle check') || system('bundle install')
+
+require 'sqlite3'
+
+puts "\n== Searching a database =="
+
+if File.exist?('db/database.db')
+  puts "\n== Database found: Starting the project =="
+else
+  puts "\n== Database unfound: Create Tables =="
+  
+  begin
+    data = File.readlines(Dir.pwd + '/data/populacao_2019.csv')
+
+    db = SQLite3::Database.new 'db/database.db'
+    db.execute <<-SQL
+      CREATE TABLE UF(
+        Code int,
+        Title varchar(30),
+        Trash varchar(30)
+      );
+    SQL
+
+    db.execute <<-SQL
+      CREATE TABLE MU(
+        Code int,
+        Title varchar(30),
+        Habitants int,
+        Trash varchar(2)
+      );
+    SQL
+
+    
+
+    data.each do |dados|
+      dados = dados.split(',')
+      if dados[0] == 'UF'
+        dados.shift
+        db.execute 'INSERT INTO UF VALUES ( ?, ?, ?)', dados
+      elsif dados[0] == 'MU'
+        dados.shift
+        db.execute 'INSERT INTO MU VALUES ( ?, ?, ?, ?)', dados
+      end
+    end
+
+    rescue SQLite3::Exception => e
+      puts e
+    ensure
+      puts "\n== We finish to preparate database :) =="
+      db.close if db
+    end
+end
