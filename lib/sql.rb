@@ -8,6 +8,10 @@ class Sql
   def self.most_populate(codigo)
     new(codigo).populate
   end
+
+  def self.search_mu(codigo)
+    new(codigo).mu_populate
+  end
   
   def initialize(codigo)
     @codigo = codigo
@@ -22,7 +26,7 @@ class Sql
     @db.execute "SELECT title FROM MU WHERE code LIKE'#{@codigo}%' ORDER BY habitants DESC LIMIT 10"
   end
 
-  def read_file(file)
-    File.open(Dir.pwd + "/queries/#{file}").read
+  def mu_populate
+    @db.execute "SELECT habitants FROM MU WHERE title='#{@codigo}' OR code='#{@codigo}'"
   end
 end
