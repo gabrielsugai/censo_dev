@@ -4,10 +4,16 @@ require 'sqlite3'
 describe Sql do
   db = SQLite3::Database.open "db/database.db"
   
-  it 'Encortar um estado pelo codigo' do
+  it 'Deveria encortar o codigo de um estado pelo nome' do
+    uf = 'São Paulo'
+    resultado = Sql.search_uf(uf)
+    expect(resultado.first).to include(35)
+  end
+
+  it 'Deveria encortar o codigo de um estado pelo codigo' do
     uf = '35'
     resultado = Sql.search_uf(uf)
-    expect(resultado.first).to include('São Paulo')
+    expect(resultado.first).to include(35)
   end
 
   it 'Listar os 10 municipios mais populosos de um estado' do
@@ -29,6 +35,18 @@ describe Sql do
     mu = '3550308'
     resultado = Sql.search_mu(mu)
     expect(resultado.first).to include(12252023)
+  end
+
+  it 'Deveria informar a populacao total de uma UF buscando pelo codigo' do
+    uf = '35'
+    resultado = Sql.total_population(uf)
+    expect(resultado.first).to include(45919049)
+  end
+
+  it 'Deveria informar a populacao total de uma UF buscando pelo nome' do
+    uf = 'São Paulo'
+    resultado = Sql.total_population(uf)
+    expect(resultado.first).to include(45919049)
   end
 
 end

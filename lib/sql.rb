@@ -12,6 +12,10 @@ class Sql
   def self.search_mu(codigo)
     new(codigo).mu_populate
   end
+
+  def self.total_population(codigo)
+    new(codigo).sum_population
+  end
   
   def initialize(codigo)
     @codigo = codigo
@@ -19,7 +23,7 @@ class Sql
   end
 
   def search
-   @db.execute "SELECT title FROM UF WHERE code LIKE'#{@codigo}'"
+   @db.execute "SELECT code FROM UF WHERE title='#{@codigo}' OR code='#{@codigo}'"
   end
   
   def populate
@@ -29,4 +33,9 @@ class Sql
   def mu_populate
     @db.execute "SELECT habitants FROM MU WHERE title='#{@codigo}' OR code='#{@codigo}'"
   end
+
+  def sum_population
+    @db.execute "SELECT SUM(habitants) FROM MU WHERE code LIKE '#{search.first.first}%'"
+  end
+
 end
